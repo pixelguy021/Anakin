@@ -1,0 +1,361 @@
+.container {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;
+}
+
+.mapArea {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  background: var(--bg-raised);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-dim);
+  padding: 20px;
+  overflow: hidden;
+}
+
+.worldSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.continent {
+  fill: var(--bg-overlay);
+  stroke: var(--border-dim);
+  stroke-width: 0.2;
+}
+
+.regionNode {
+  transition: all 0.2s ease;
+}
+
+.regionNode:hover {
+  opacity: 1 !important;
+  filter: brightness(1.3);
+}
+
+.glowRing {
+  transition: all 0.2s ease;
+}
+
+.regionLabel {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legendTitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Locale list */
+.localeList {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  background: var(--bg-raised);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-dim);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-dim);
+  flex-shrink: 0;
+}
+
+.listTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.locales {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.localeItem {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.localeItem:hover {
+  background: var(--bg-overlay);
+  border-color: var(--border-dim);
+}
+
+.localeActive {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: var(--brand-primary) !important;
+}
+
+.localeTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.localeName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.localeCountry {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.localeMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coverageBar {
+  height: 3px;
+  background: var(--bg-highlight);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.coverageFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.localeStats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+}
+
+.localeHarvested {
+  color: var(--text-muted);
+}
+
+/* Detail panel */
+.detailPanel {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--bg-raised);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-bright);
+  padding: 18px;
+  overflow-y: auto;
+  animation: fadeInUp 0.25s ease;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.detailLang {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.detailCountry {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.detailStats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.dStat {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.dStatVal {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.dStatLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.detailSection {
+  margin-bottom: 14px;
+}
+
+.sectionLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.phraseRow {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 6px;
+}
+
+.phraseKey {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.phrasePair {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.phraseAuth, .phraseTrans {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.authTag {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.transTag {
+  font-size: 0.65rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.authText {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.transText {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-color: rgba(245, 158, 11, 0.4);
+}
+
+.phraseScore {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+}
+
+.phraseSource {
+  color: var(--text-faint);
+}
+
+.sourceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+}
+
+.sourceName {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.sourceType {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.sourcePhrases {
+  color: var(--brand-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
