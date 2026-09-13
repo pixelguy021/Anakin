@@ -1,8 +1,8 @@
 // app/api/agent/route.ts
-// Local model agent — powered by Ollama via OpenAI-compatible endpoint
+// Cloud model agent — powered by Google Gemini (for cloud deployment)
 // Web scraping powered by Anakin.io URL Scraper API (Zero Touch / API key)
 
-import { createOpenAI } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { generateText, isStepCount } from "ai";
 import { tool, zodSchema } from "@ai-sdk/provider-utils";
 import { z } from "zod";
@@ -11,9 +11,8 @@ import { HARVEST_FEED } from "@/lib/harvest-stream";
 
 export const maxDuration = 120;
 
-// Use the local Ollama instance via its OpenAI-compatible endpoint — no API key needed
-const ollamaClient = createOpenAI({ baseURL: "http://localhost:11434/v1", apiKey: "none" });
-const MODEL = "clarion-qwen:latest";
+// Use a cloud-hosted Gemini model so this can be deployed to Vercel easily
+const MODEL = "gemini-1.5-flash";
 
 const ANAKIN_API_KEY = process.env.ANAKIN_API_KEY || "";
 const ANAKIN_SCRAPER_URL = "https://api.anakin.io/v1/url-scraper/scrape";
@@ -196,62 +195,69 @@ async function executeScrapeUrl({ url }: z.infer<typeof scrapeUrlSchema>) {
 // ── Route handler ───────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const { messages } = await req.json();
 
-  const model = ollamaClient(MODEL);
+    const model = google(MODEL);
 
-  const result = await generateText({
-    model,
-    system: SYSTEM_PROMPT,
-    messages,
-    stopWhen: isStepCount(5),
-    tools: {
-      look_up_locale: tool({
-        description: "Look up authentic in-market phrases for a country-language pair",
-        inputSchema: zodSchema(lookupLocaleSchema),
-        execute: executeLookupLocale,
-      }),
-      compare_phrases: tool({
-        description: "Compare authentic phrasing vs model-translated text for a concept across locales",
-        inputSchema: zodSchema(comparePhrasesSchema),
-        execute: executeComparePhrases,
-      }),
-      list_sources: tool({
-        description: "List active web harvest sources for a locale",
-        inputSchema: zodSchema(listSourcesSchema),
-        execute: executeListSources,
-      }),
-      harvest_status: tool({
-        description: "Get global corpus harvest statistics",
-        inputSchema: zodSchema(harvestStatusSchema),
-        execute: executeHarvestStatus,
-      }),
-      recommend_sources: tool({
-        description: "Recommend highest-yield web sources for a region",
-        inputSchema: zodSchema(recommendSourcesSchema),
-        execute: executeRecommendSources,
-      }),
-      scrape_url: tool({
-        description: "Scrape any live URL using Anakin.io and return clean Markdown content. Use this when the user asks to browse, fetch, or read a specific website.",
-        inputSchema: zodSchema(scrapeUrlSchema),
-        execute: executeScrapeUrl,
-      }),
-    },
-  });
+    const result = await generateText({
+      model,
+      system: SYSTEM_PROMPT,
+      messages,
+      stopWhen: isStepCount(5),
+      tools: {
+        look_up_locale: tool({
+          description: "Look up authentic in-market phrases for a country-language pair",
+          inputSchema: zodSchema(lookupLocaleSchema),
+          execute: executeLookupLocale,
+        }),
+        compare_phrases: tool({
+          description: "Compare authentic phrasing vs model-translated text for a concept across locales",
+          inputSchema: zodSchema(comparePhrasesSchema),
+          execute: executeComparePhrases,
+        }),
+        list_sources: tool({
+          description: "List active web harvest sources for a locale",
+          inputSchema: zodSchema(listSourcesSchema),
+          execute: executeListSources,
+        }),
+        harvest_status: tool({
+          description: "Get global corpus harvest statistics",
+          inputSchema: zodSchema(harvestStatusSchema),
+          execute: executeHarvestStatus,
+        }),
+        recommend_sources: tool({
+          description: "Recommend highest-yield web sources for a region",
+          inputSchema: zodSchema(recommendSourcesSchema),
+          execute: executeRecommendSources,
+        }),
+        scrape_url: tool({
+          description: "Scrape any live URL using Anakin.io and return clean Markdown content. Use this when the user asks to browse, fetch, or read a specific website.",
+          inputSchema: zodSchema(scrapeUrlSchema),
+          execute: executeScrapeUrl,
+        }),
+      },
+    });
 
-  const toolCalls = result.steps?.flatMap((step) => {
-    const calls = (step.toolCalls as Array<Record<string, unknown>>) || [];
-    const results = (step.toolResults as Array<Record<string, unknown>>) || [];
-    return calls.map((tc, i) => ({
-      toolName: String(tc.toolName || ""),
-      args: tc.input || tc.args || {},
-      result: results[i] ? results[i].output ?? results[i].result : undefined,
-    }));
-  }) || [];
+    const toolCalls = result.steps?.flatMap((step) => {
+      const calls = (step.toolCalls as Array<Record<string, unknown>>) || [];
+      const results = (step.toolResults as Array<Record<string, unknown>>) || [];
+      return calls.map((tc, i) => ({
+        toolName: String(tc.toolName || ""),
+        args: tc.input || tc.args || {},
+        result: results[i] ? results[i].output ?? results[i].result : undefined,
+      }));
+    }) || [];
 
-  return Response.json({
-    text: result.text,
-    toolCalls,
-    finishReason: result.finishReason,
-  });
+    return Response.json({
+      text: result.text,
+      toolCalls,
+      finishReason: result.finishReason,
+    });
+  } catch (error: any) {
+    console.error("Agent Error:", error);
+    return Response.json({ 
+      error: error.message || "An unexpected error occurred in the agent API" 
+    }, { status: 500 });
+  }
 }

@@ -82,7 +82,20 @@ export default function AgentChat() {
         }),
       });
 
-      const data = await res.json();
+      let data;
+      const textResponse = await res.text();
+      try {
+        data = JSON.parse(textResponse);
+      } catch (err) {
+        setMessages(prev =>
+          prev.map(m =>
+            m.id === assistantId
+              ? { ...m, isLoading: false, content: `⚠️ Server Error: ${res.status} ${res.statusText}. Please check the Vercel logs or ensure your API keys are set correctly.` }
+              : m
+          )
+        );
+        return;
+      }
 
       if (!res.ok || data.error) {
         setMessages(prev =>
