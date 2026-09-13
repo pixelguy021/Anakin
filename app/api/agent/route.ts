@@ -12,7 +12,7 @@ import { HARVEST_FEED } from "@/lib/harvest-stream";
 export const maxDuration = 120;
 
 // Use a cloud-hosted Gemini model so this can be deployed to Vercel easily
-const MODEL = "gemini-2.0-flash";
+const MODEL = "gemini-3.6-flash";
 
 const ANAKIN_API_KEY = process.env.ANAKIN_API_KEY || "";
 const ANAKIN_SCRAPER_URL = "https://api.anakin.io/v1/url-scraper/scrape";
